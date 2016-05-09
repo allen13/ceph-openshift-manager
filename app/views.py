@@ -1,28 +1,30 @@
 from flask import render_template, flash, redirect, request
 from app import app
-from .forms import LoginForm
-from volumes import get_ceph_openshift_volumes, get_ceph_clusters
+from forms import *
+from volumes import *
 
-@app.route('/')
-@app.route('/index')
+@app.route('/', methods=['GET'])
+@app.route('/volumes', methods=['GET', 'POST'])
 def index():
+    form = VolumeForm()
+    if form.validate_on_submit():
+        create_ceph_openshift_volume(
+            form.cluster.data,
+            str(form.volumeName.data),
+            form.volumeSize.data,
+            form.project.data
+        )
+        return redirect('/volumes')
+
     page_data = dict()
     page_data['rbd_images'] = get_ceph_openshift_volumes()
 
     if request.mimetype == 'application/json':
         return jsonify(page_data)
     else:
-        return render_template('volumes.html', data=page_data, config=get_ceph_clusters())
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        flash('Login requested for OpenID="%s", remember_me=%s' %
-              (form.openid.data, str(form.remember_me.data)))
-        return redirect('/index')
-    return render_template('login.html',
-                           title='Sign In',
-                           form=form,
-                           providers=app.config['OPENID_PROVIDERS'])
+        return render_template(
+            'volumes.html',
+            data=page_data,
+            projects=get_openshift_projects(),
+            form=form
+        )

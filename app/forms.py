@@ -1,8 +1,10 @@
 from flask.ext.wtf import Form
-from wtforms import StringField, BooleanField
+from wtforms import StringField, IntegerField
 from wtforms.validators import DataRequired
 
 
-class LoginForm(Form):
-    openid = StringField('openid', validators=[DataRequired()])
-    remember_me = BooleanField('remember_me', default=False)
+class VolumeForm(Form):
+    volumeName = StringField('volumeName', validators=[DataRequired()])
+    volumeSize = IntegerField('volumeSize', validators=[DataRequired()])
+    cluster = StringField('cluster', validators=[DataRequired()])
+    project = StringField('project', validators=[DataRequired()])
