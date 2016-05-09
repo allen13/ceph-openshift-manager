@@ -20,4 +20,4 @@ EXPOSE 5000
 
 COPY . /usr/src/app
 
-CMD python ceph-dash.py
+CMD python run.py
