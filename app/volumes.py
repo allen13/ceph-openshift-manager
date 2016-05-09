@@ -12,6 +12,7 @@ from rados import Rados
 from rados import Error as RadosError
 import rbd
 
+CEPH_CLUSTER_CONFIGS = os.getenv('CEPH_CLUSTER_CONFIGS', '/etc/ceph/clusters/')
 
 def get_ceph_clusters():
     """
@@ -19,13 +20,12 @@ def get_ceph_clusters():
     config.json
     """
 
-    config_path = current_app.config['USER_CONFIG']['config_path']
     ceph_clusters = dict()
-    for config_file in glob.glob(config_path + '*.conf'):
+    for config_file in glob.glob(CEPH_CLUSTER_CONFIGS + '*.conf'):
         cluster_name = os.path.basename(os.path.splitext(config_file)[0])
         ceph_clusters[cluster_name] = dict()
-        ceph_clusters[cluster_name]['conffile'] = config_path + cluster_name + '.conf'
-        ceph_clusters[cluster_name]['conf'] = dict(keyring = config_path + cluster_name + '.keyring')
+        ceph_clusters[cluster_name]['conffile'] = CEPH_CLUSTER_CONFIGS + cluster_name + '.conf'
+        ceph_clusters[cluster_name]['conf'] = dict(keyring = CEPH_CLUSTER_CONFIGS + cluster_name + '.keyring')
 
     return ceph_clusters
 
