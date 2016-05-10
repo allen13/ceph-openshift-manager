@@ -30,6 +30,6 @@ $( document ).ready(function() {
 
     var cluster_ids = $(".cluster").map(function() { return this.id; }).toArray();
     $.each( cluster_ids, function( index, cluster_id ) {
-      populateClusterVolumes(cluster_id);
+      getClusterVolumes(cluster_id);
     });
 });
