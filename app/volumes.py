@@ -146,7 +146,7 @@ def add_ceph_secret(project):
     """
     Adds ceph secret keyring to openshift project
     """
-    
+
     try:
         subprocess.check_output(["oc", "create", "-n", project, "-f", CEPH_KEYRING_SECRET])
     except CalledProcessError as error:
@@ -165,13 +165,16 @@ def create_openshift_pvc(image_name, image_size, monitors, project, ceph_pool='r
     manifest = {
         'apiVersion': 'v1',
         'kind': 'List',
-        'metadata': {},
+        'metadata': {
+            'namespace': project
+        },
         'items': [
             {
                 'apiVersion': 'v1',
                 'kind': 'PersistentVolume',
                 'metadata': {
-                    'name': str(image_name)
+                    'name': str(image_name),
+                    'namespace': project
                 },
                 'spec': {
                     'accessModes': ['ReadWriteOnce'],
@@ -195,7 +198,8 @@ def create_openshift_pvc(image_name, image_size, monitors, project, ceph_pool='r
                 'apiVersion': 'v1',
                 'kind': 'PersistentVolumeClaim',
                 'metadata': {
-                    'name': str(image_name)
+                    'name': str(image_name),
+                    'namespace': project
                 },
                 'spec': {
                     'accessModes': ['ReadWriteOnce'],
@@ -212,7 +216,7 @@ def create_openshift_pvc(image_name, image_size, monitors, project, ceph_pool='r
     with open(TEMP_MANIFEST_FILE, "w") as handle:
         handle.write(json.dumps(manifest, sort_keys=True, indent=4))
 
-    return subprocess.check_output(["oc", "create", "-n", project, "-f", TEMP_MANIFEST_FILE])
+    return subprocess.check_output(["oc", "create", "-f", TEMP_MANIFEST_FILE])
 
 
 def create_ceph_openshift_volume(cluster_name, image_name, image_size, project):
