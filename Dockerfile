@@ -20,4 +20,4 @@ EXPOSE 5000
 
 COPY . /usr/src/app
 
-CMD python run.py
+CMD oc project default && python run.py
