@@ -148,7 +148,7 @@ def add_ceph_secret(project):
     """
 
     try:
-        subprocess.check_output(["oc", "create", "-n", project, "-f", CEPH_KEYRING_SECRET])
+        subprocess.check_output(["oc", "create", "--namespace", project, "-f", CEPH_KEYRING_SECRET])
     except CalledProcessError as error:
         if not error.output.find('already exists'):
             raise
@@ -216,7 +216,7 @@ def create_openshift_pvc(image_name, image_size, monitors, project, ceph_pool='r
     with open(TEMP_MANIFEST_FILE, "w") as handle:
         handle.write(json.dumps(manifest, sort_keys=True, indent=4))
 
-    return subprocess.check_output(["oc", "create", "-f", TEMP_MANIFEST_FILE])
+    return subprocess.check_output(["oc", "create","--namespace", project, "-f", TEMP_MANIFEST_FILE])
 
 
 def create_ceph_openshift_volume(cluster_name, image_name, image_size, project):
