@@ -20,4 +20,4 @@ EXPOSE 5000
 
 COPY . /usr/src/app
 
-CMD oc project default && gunicorn --bind 0.0.0.0:5000 --workers 10 wsgi
+CMD oc project default && gunicorn --bind 0.0.0.0:5000 --workers 10 wsgi:app
