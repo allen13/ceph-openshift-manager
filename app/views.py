@@ -31,4 +31,5 @@ def index():
 
 @app.route('/volumes/<cluster>', methods=['GET'])
 def get_cluster_volumes(cluster):
-    return jsonify(get_cluster_ceph_openshift_volumes(cluster))
+    volumes = get_cluster_ceph_openshift_volumes(cluster)
+    return jsonify({"volumes": volumes})

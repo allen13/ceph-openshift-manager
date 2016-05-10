@@ -1,4 +1,5 @@
-var populateClusterVolumes = function(cluster_id, volumes) {
+var populateClusterVolumes = function(cluster_id, data) {
+  volumes = data["volumes"];
   cluster_element = $("#" + cluster_id )
   if( volumes.length > 0 ){
     cluster_element.empty()
@@ -20,9 +21,15 @@ var populateClusterVolumes = function(cluster_id, volumes) {
 };
 
 var getClusterVolumes = function(cluster_id) {
-  $.get( "/volumes/" + cluster_id , function( data ) {
-    populateClusterVolumes(cluster_id, data)
-  });
+  $.get("/volumes/" + cluster_id)
+    .done(function( data ) {
+      populateClusterVolumes(cluster_id, data)
+    })
+    .fail(function() {
+      cluster_element = $("#" + cluster_id )
+      cluster_element.empty()
+      cluster_element.append('<tr><td colspan="5" align="center" ><i class="fa fa-exclamation" style="font-size:30px"></i></td></tr>')
+    });
 };
 
 $( document ).ready(function() {
