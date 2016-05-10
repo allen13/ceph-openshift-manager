@@ -198,6 +198,7 @@ def create_openshift_pvc(image_name, image_size, monitors, project, ceph_pool='r
                     'name': str(image_name),
                 },
                 'spec': {
+                    'volumeName' : str(image_name),
                     'accessModes': ['ReadWriteOnce'],
                     'resources': {
                         'requests': {
