@@ -13,6 +13,7 @@ from rados import Error as RadosError
 import rbd
 
 CEPH_CLUSTER_CONFIGS = os.getenv('CEPH_CLUSTER_CONFIGS', '/etc/ceph/clusters/')
+CEPH_KEYRING_SECRET = os.getenv('CEPH_KEYRING_SECRET', '/etc/ceph/secret/ceph-secret.yml')
 
 
 def get_ceph_clusters():
@@ -140,11 +141,18 @@ def create_rbd_image(cluster_name, image_name, image_size, ceph_pool = 'rbd'):
             size = image_size * (1024**3)
             rbd_inst.create(ioctx, image_name, size)
 
+def add_ceph_secret(project):
+    """
+    Adds ceph secret keyring to openshift project
+    """
+    return subprocess.check_output(["oc", "create", "-n", project, "-f", CEPH_KEYRING_SECRET])
 
 def create_openshift_pvc(image_name, image_size, monitors, project, ceph_pool='rbd'):
     """
     Creates an openshift PV and PVC in a list manifest for the ceph storage
     """
+
+    add_ceph_secret(project)
 
     TEMP_MANIFEST_FILE = "/tmp/ceph-openshift-pv.json"
 
