@@ -5,6 +5,7 @@ import json
 import glob
 import os
 import subprocess
+from subprocess import CalledProcessError
 import ConfigParser
 import dpath
 
@@ -145,7 +146,12 @@ def add_ceph_secret(project):
     """
     Adds ceph secret keyring to openshift project
     """
-    return subprocess.check_output(["oc", "create", "-n", project, "-f", CEPH_KEYRING_SECRET])
+    
+    try:
+        subprocess.check_output(["oc", "create", "-n", project, "-f", CEPH_KEYRING_SECRET])
+    except CalledProcessError as error:
+        if not error.output.find('already exists'):
+            raise
 
 def create_openshift_pvc(image_name, image_size, monitors, project, ceph_pool='rbd'):
     """
