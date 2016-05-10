@@ -165,16 +165,13 @@ def create_openshift_pvc(image_name, image_size, monitors, project, ceph_pool='r
     manifest = {
         'apiVersion': 'v1',
         'kind': 'List',
-        'metadata': {
-            'namespace': str(project)
-        },
+        'metadata': {},
         'items': [
             {
                 'apiVersion': 'v1',
                 'kind': 'PersistentVolume',
                 'metadata': {
                     'name': str(image_name),
-                    'namespace': str(project)
                 },
                 'spec': {
                     'accessModes': ['ReadWriteOnce'],
@@ -199,7 +196,6 @@ def create_openshift_pvc(image_name, image_size, monitors, project, ceph_pool='r
                 'kind': 'PersistentVolumeClaim',
                 'metadata': {
                     'name': str(image_name),
-                    'namespace': str(project)
                 },
                 'spec': {
                     'accessModes': ['ReadWriteOnce'],

@@ -12,7 +12,7 @@ RUN yum install -y epel-release && \
 
 RUN pip install dpath flask-wtf
 
-RUN curl -L https://github.com/openshift/origin/releases/download/v1.1.6/openshift-origin-client-tools-v1.1.6-ef1caba-linux-64bit.tar.gz | tar xz && \
+RUN curl -L https://github.com/openshift/origin/releases/download/v1.2.0-rc2/openshift-origin-client-tools-v1.2.0-rc2-642f0af-linux-64bit.tar.gz | tar xz && \
     mv openshift*/oc /usr/local/bin && \
     rm -rf openshift-origin-client-tools-*
 
