@@ -16,18 +16,13 @@ def index():
         )
         return redirect('/volumes')
 
-    page_data = dict()
-    page_data['rbd_images'] = get_ceph_openshift_volumes()
+    return render_template(
+        'volumes.html',
+        ceph_clusters=get_ceph_clusters().keys(),
+        projects=get_openshift_projects(),
+        form=form
+    )
 
-    if request.mimetype == 'application/json':
-        return jsonify(page_data)
-    else:
-        return render_template(
-            'volumes.html',
-            ceph_clusters=get_ceph_clusters().keys(),
-            projects=get_openshift_projects(),
-            form=form
-        )
 
 @app.route('/volumes/<cluster>', methods=['GET'])
 def get_cluster_volumes(cluster):
