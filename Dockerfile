@@ -6,7 +6,7 @@ WORKDIR /usr/src/app
 COPY ceph.repo /etc/yum.repos.d/ceph.repo
 
 RUN yum install -y epel-release && \
-    yum install -y python python-pip python-flask && \
+    yum install -y python python-pip python-flask python-gunicorn && \
     yum install -y ceph && \
     yum clean all -y
 
@@ -20,4 +20,4 @@ EXPOSE 5000
 
 COPY . /usr/src/app
 
-CMD oc project default && python run.py
+CMD oc project default && gunicorn --bind 0.0.0.0:5000 --workers 10 wsgi
