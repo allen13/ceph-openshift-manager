@@ -61,6 +61,43 @@ def get_ceph_config_monitors(ceph_config):
 
     return monitors
 
+def get_cluster_rbd_images(cluster, ceph_pool = 'rbd'):
+    rbd_images = []
+    cluster_config = get_ceph_clusters()[cluster]
+    ceph_config = parse_ceph_config(cluster_config['conffile'])
+    ceph_monitors = get_ceph_config_monitors(ceph_config)
+
+    with Rados(**cluster_config) as cluster:
+        with cluster.open_ioctx(ceph_pool) as ioctx:
+            rbd_inst = rbd.RBD()
+            for rbd_image_name in rbd_inst.list(ioctx):
+                with rbd.Image(ioctx, rbd_image_name) as rbd_image:
+                    rbd_images.append({
+                        'name': rbd_image_name,
+                        'size': (rbd_image.size() / 1024**3),
+                        'monitors': ceph_monitors
+                    })
+
+    return rbd_images
+
+def get_cluster_ceph_openshift_volumes(cluster, ceph_pool = 'rbd'):
+    """
+    Matches ceph volumes with openshift persistent volumes and returns a dict
+    """
+
+    cluster_rbd_images = get_cluster_rbd_images(cluster, ceph_pool)
+    openshift_pvs = get_openshift_pvs()
+
+    for rbd_image in cluster_rbd_images:
+        for openshift_pv in openshift_pvs:
+            if ((openshift_pv['spec']['rbd']['image'] == rbd_image['name']) and
+                (set(openshift_pv['spec']['rbd']['monitors']) == set(rbd_image['monitors']))):
+                rbd_image['pv'] = openshift_pv['metadata']['name']
+                if 'claimRef' in openshift_pv['spec']:
+                    rbd_image['pvc'] = openshift_pv['spec']['claimRef']['name']
+                    rbd_image['project'] = openshift_pv['spec']['claimRef']['namespace']
+
+    return cluster_rbd_images
 
 def get_rbd_images(ceph_pool = 'rbd'):
     """

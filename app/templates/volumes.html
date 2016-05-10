@@ -24,7 +24,7 @@
         </div>
       </div>
 
-      {% for cluster_name, rbd_images in data['rbd_images'].iteritems() %}
+      {% for cluster_name in ceph_clusters %}
       <div class="row">
         <div class="col-md-12">
           <div class="panel panel-default">
@@ -33,10 +33,8 @@
               <!--here we add the bytes written per second-->
               <table class="table table-bordered">
               <thead> <tr> <th>Volume</th> <th> Size (GB) </th> <th> OpenShift Project </th> <th> Persistent Volume <th> Persistent Volume Claim </th></tr> </thead>
-              <tbody>
-              {% for rbd_image in rbd_images %}
-                <tr> <td>{{ rbd_image['name'] }}</td> <td>{{ rbd_image['size'] }}</td> <td>{{ rbd_image['project'] }}</td> <td>{{ rbd_image['pv'] }}</td> <td>{{ rbd_image['pvc'] }}</td>
-              {% endfor %}
+              <tbody id="{{ cluster_name }}" class="cluster">
+                <tr><td colspan="5" align="center" ><i class="fa fa-spinner fa-spin" style="font-size:24px"></i></td></tr>
               </tbody>
               </table>
             </div>
@@ -72,7 +70,7 @@
             <label for="clusterSelect">Ceph Cluster</label>
             <br/>
             <select id="cluster" name="cluster" form="createVolumeForm" class="selectpicker">
-              {% for cluster_name in data['rbd_images'] %}
+              {% for cluster_name in ceph_clusters %}
               <option value="{{ cluster_name }}">{{ cluster_name }}</option>
               {% endfor %}
             </select>

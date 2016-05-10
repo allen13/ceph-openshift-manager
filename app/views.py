@@ -24,7 +24,11 @@ def index():
     else:
         return render_template(
             'volumes.html',
-            data=page_data,
+            ceph_clusters=get_ceph_clusters().keys(),
             projects=get_openshift_projects(),
             form=form
         )
+
+@app.route('/volumes/<cluster>', methods=['GET'])
+def get_cluster_volumes(cluster):
+    return jsonify(get_cluster_ceph_openshift_volumes(cluster))
