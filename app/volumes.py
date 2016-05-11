@@ -75,14 +75,17 @@ def get_cluster_rbd_images(cluster, ceph_pool = 'rbd'):
                     rbd_images.append({
                         'name': rbd_image_name,
                         'size': (rbd_image.size() / 1024**3),
-                        'monitors': ceph_monitors
+                        'monitors': ceph_monitors,
+                        'project':'',
+                        'pvc': '',
+                        'pv':''
                     })
 
     return rbd_images
 
 def get_cluster_ceph_openshift_volumes(cluster, ceph_pool = 'rbd'):
     """
-    Matches ceph volumes with openshift persistent volumes and returns a dict
+    Matches ceph volumes with openshift persistent volumes
     """
 
     cluster_rbd_images = get_cluster_rbd_images(cluster, ceph_pool)
@@ -98,32 +101,6 @@ def get_cluster_ceph_openshift_volumes(cluster, ceph_pool = 'rbd'):
                     rbd_image['project'] = openshift_pv['spec']['claimRef']['namespace']
 
     return cluster_rbd_images
-
-def get_rbd_images(ceph_pool = 'rbd'):
-    """
-    Grab a dictionary of rbd images in a pool across all clusters
-    """
-
-    all_images = dict()
-    for cluster_name, cluster_config in get_ceph_clusters().iteritems():
-        all_images[cluster_name] = []
-        ceph_config = parse_ceph_config(cluster_config['conffile'])
-        ceph_monitors = get_ceph_config_monitors(ceph_config)
-        with Rados(**cluster_config) as cluster:
-            with cluster.open_ioctx(ceph_pool) as ioctx:
-                rbd_inst = rbd.RBD()
-                for rbd_image_name in rbd_inst.list(ioctx):
-                    with rbd.Image(ioctx, rbd_image_name) as rbd_image:
-                        rbd_size = (rbd_image.size() / 1024**3)
-                        rbd_data = {
-                            'name': rbd_image_name,
-                            'size': rbd_size,
-                            'monitors': ceph_monitors
-                        }
-                        all_images[cluster_name].append(rbd_data)
-
-    return all_images
-
 
 def get_openshift_pvs():
     """
@@ -143,27 +120,6 @@ def get_openshift_projects():
     openshift_projects = json.loads(subprocess.check_output(["oc", "get", "projects", "-o" "json"]))['items']
 
     return [ project['metadata']['name'] for project in openshift_projects ]
-
-
-def get_ceph_openshift_volumes(ceph_pool = 'rbd'):
-    """
-    Matches ceph volumes with openshift persistent volumes and returns a dict
-    """
-
-    ceph_openshift_images = get_rbd_images(ceph_pool)
-    openshift_pvs = get_openshift_pvs()
-
-    for cluster_name, rbd_images in ceph_openshift_images.iteritems():
-        for rbd_image in rbd_images:
-            for openshift_pv in openshift_pvs:
-                if ((openshift_pv['spec']['rbd']['image'] == rbd_image['name']) and
-                    (set(openshift_pv['spec']['rbd']['monitors']) == set(rbd_image['monitors']))):
-                    rbd_image['pv'] = openshift_pv['metadata']['name']
-                    if 'claimRef' in openshift_pv['spec']:
-                        rbd_image['pvc'] = openshift_pv['spec']['claimRef']['name']
-                        rbd_image['project'] = openshift_pv['spec']['claimRef']['namespace']
-
-    return ceph_openshift_images
 
 
 def create_rbd_image(cluster_name, image_name, image_size, ceph_pool = 'rbd'):
