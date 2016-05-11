@@ -18,7 +18,7 @@ def index():
 
     return render_template(
         'volumes.html',
-        ceph_clusters=get_ceph_clusters().keys(),
+        ceph_clusters=sorted(get_ceph_clusters().keys()),
         projects=get_openshift_projects(),
         form=form
     )
