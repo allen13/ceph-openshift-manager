@@ -1,7 +1,7 @@
 var populateClusterVolumes = function(cluster_id, data) {
   volumes = data["volumes"];
   cluster_element = $("#" + cluster_id )
-  if( volumes.length > 0 ){
+  if( volumes.length >= 0 ){
     cluster_element.empty()
   }
   $.each( volumes, function( index, volume ) {
