@@ -133,7 +133,7 @@ def create_rbd_image(cluster_name, image_name, image_size, ceph_pool = 'rbd'):
         with cluster.open_ioctx(ceph_pool) as ioctx:
             rbd_inst = rbd.RBD()
             size = image_size * (1024**3)
-            rbd_inst.create(ioctx, image_name, size, None, False, 5)
+            rbd_inst.create(ioctx, image_name, size, None, False, 1)
 
 def add_ceph_secret(project):
     """

@@ -3,7 +3,9 @@ FROM centos:centos7
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-RUN yum install -y epel-release centos-release-ceph && \
+COPY ceph.repo /etc/yum.repos.d/ceph.repo
+
+RUN yum install -y epel-release && \
     yum install -y python python-pip python-flask python-gunicorn && \
     yum install -y ceph && \
     yum clean all -y
