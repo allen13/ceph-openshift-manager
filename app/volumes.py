@@ -94,8 +94,7 @@ def get_cluster_ceph_openshift_volumes(cluster, ceph_pool = 'rbd'):
 
     for rbd_image in cluster_rbd_images:
         for openshift_pv in openshift_pvs:
-            if ((openshift_pv['spec']['rbd']['image'] == rbd_image['name']) and
-                (set(openshift_pv['spec']['rbd']['monitors']) == set(rbd_image['monitors']))):
+            if (openshift_pv['spec']['rbd']['image'] == rbd_image['name']):
                 rbd_image['pv'] = openshift_pv['metadata']['name']
                 if 'claimRef' in openshift_pv['spec']:
                     rbd_image['pvc'] = openshift_pv['spec']['claimRef']['name']
