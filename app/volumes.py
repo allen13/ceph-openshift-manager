@@ -214,10 +214,11 @@ def create_ceph_openshift_volume(cluster_name, image_name, image_size, project):
     Takes validated form object and creates a ceph image and assigns it to a
     project in openshift_pv
     """
+    print("creating cluster_name:%(cluster_name)s, image_name:%(image_name)s, image_size:%(image_size)s, project: %(project)s" % locals())
 
     ceph_clusters = get_ceph_clusters()
     ceph_config = parse_ceph_config(ceph_clusters[cluster_name]['conffile'])
-    ceph_monitors = get_ceph_config_monitors(ceph_config)
+    ceph_monitors = get_ceph_config_monitors(ceph_clusters[cluster_name]['conffile'])
 
     create_rbd_image(cluster_name, image_name, image_size)
     create_openshift_pvc(image_name, image_size, ceph_monitors, project)
