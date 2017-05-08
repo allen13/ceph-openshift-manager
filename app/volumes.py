@@ -15,7 +15,7 @@ import rbd
 
 CEPH_CLUSTER_CONFIGS = os.getenv('CEPH_CLUSTER_CONFIGS', '/etc/ceph/clusters/')
 CEPH_KEYRING_SECRET = os.getenv('CEPH_KEYRING_SECRET', '/etc/ceph/secret/ceph-secret.yml')
-CEPH_MONITOR_URL = os.getenv('CEPH_MONITOR_URL', 'ceph-mon-%(cluster_name).service.os:6789')
+CEPH_MONITOR_URL = os.getenv('CEPH_MONITOR_URL', 'ceph-mon-%(cluster_name)s.service.os:6789')
 
 
 def get_ceph_clusters():
