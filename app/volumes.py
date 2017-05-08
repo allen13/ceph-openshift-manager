@@ -15,6 +15,7 @@ import rbd
 
 CEPH_CLUSTER_CONFIGS = os.getenv('CEPH_CLUSTER_CONFIGS', '/etc/ceph/clusters/')
 CEPH_KEYRING_SECRET = os.getenv('CEPH_KEYRING_SECRET', '/etc/ceph/secret/ceph-secret.yml')
+CEPH_MONITOR_URL = os.getenv('CEPH_MONITOR_URL', 'ceph-mon-%(cluster_name).service.os:6789')
 
 
 def get_ceph_clusters():
@@ -52,20 +53,20 @@ def parse_ceph_config(conffile):
 
     return ceph_config
 
-def get_ceph_config_monitors(ceph_config):
+def get_ceph_config_monitors(config_file):
     """
-    Takes a ceph config as a python dictionary and returns the list of monitors
+    Takes a ceph config file extracts the cluster name and combines it with a url
     """
 
-    monitors = dpath.util.values(ceph_config, 'mon.*/mon_addr')
-
+    cluster_name = os.path.basename(os.path.splitext(config_file)[0])
+    monitors = [CEPH_MONITOR_URL % locals()]
     return monitors
 
 def get_cluster_rbd_images(cluster, ceph_pool = 'rbd'):
     rbd_images = []
     cluster_config = get_ceph_clusters()[cluster]
     ceph_config = parse_ceph_config(cluster_config['conffile'])
-    ceph_monitors = get_ceph_config_monitors(ceph_config)
+    ceph_monitors = get_ceph_config_monitors(cluster_config['conffile'])
 
     with Rados(**cluster_config) as cluster:
         with cluster.open_ioctx(ceph_pool) as ioctx:
